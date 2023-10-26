@@ -6,6 +6,7 @@ class SalesModel extends Model {
   declare clothe_price: number;
   declare clothe_id: number;
   declare user_id: number;
+  declare confirmed_sale: boolean;
 }
 
 SalesModel.init(
@@ -25,6 +26,14 @@ SalesModel.init(
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
+    confirmed_sale: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+    clothe_price: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    }
   },
   {
     tableName: 'sales',

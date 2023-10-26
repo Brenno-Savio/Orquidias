@@ -3,8 +3,9 @@ import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database';
 import AddressesModel from './AddressesModel';
 import ClothesModel from './ClothesModel';
+import SalesModel from './SalesModel';
 
-class UserModel extends Model {
+class UsersModel extends Model {
   declare id: number;
   declare name: string;
   declare lastname: string;
@@ -26,7 +27,7 @@ class UserModel extends Model {
   }
 }
 
-UserModel.init(
+UsersModel.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -123,14 +124,14 @@ UserModel.init(
   },
 );
 
-UserModel.addHook('beforeSave', async (user: UserModel) => {
+UsersModel.addHook('beforeSave', async (user: UsersModel) => {
   if (user.password) {
     user.password_hash = await hash(user.password, 8);
   }
 });
 
-UserModel.hasMany(ClothesModel, { foreignKey: 'user_id' });
-UserModel.hasMany(SalesModel, { foreignKey: 'user_id' });
-UserModel.hasOne(AddressesModel, { foreignKey: 'user_id' });
+UsersModel.hasMany(ClothesModel, { foreignKey: 'user_id' });
+UsersModel.hasMany(SalesModel, { foreignKey: 'user_id' });
+UsersModel.hasOne(AddressesModel, { foreignKey: 'user_id' });
 
-export default UserModel;
+export default UsersModel;

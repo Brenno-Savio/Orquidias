@@ -70,4 +70,5 @@ ClothesModel.hasMany(PictureModel, { foreignKey: 'clothe_id' });
 ClothesModel.hasMany(SalesModel, { foreignKey: 'clothe_id' });
 
 
+
 export default ClothesModel;

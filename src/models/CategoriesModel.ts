@@ -2,12 +2,12 @@ import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database';
 import ClothesModel from './ClothesModel';
 
-class CategoryModel extends Model {
+class CategoriesModel extends Model {
   declare id: number;
   declare name: string;
 }
 
-CategoryModel.init(
+CategoriesModel.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -36,6 +36,6 @@ CategoryModel.init(
   },
 );
 
-CategoryModel.hasMany(ClothesModel, { foreignKey: 'category_id' });
+CategoriesModel.hasMany(ClothesModel, { foreignKey: 'category_id' });
 
-export default CategoryModel;
+export default CategoriesModel;

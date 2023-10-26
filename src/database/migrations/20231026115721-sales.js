@@ -9,15 +9,13 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
+      confirmed_sale: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
       clothe_price: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'clothes',
-          key: 'price',
-        },
-        onDelete: 'NO ACTION',
-        onUpdate: 'NO ACTION',
       },
       clothe_id: {
         type: Sequelize.INTEGER,
@@ -36,8 +34,8 @@ module.exports = {
           model: 'users',
           key: 'id',
         },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+        onDelete: 'NO ACTION',
+        onUpdate: 'NO ACTION',
       },
       created_at: {
         type: Sequelize.DATE,
