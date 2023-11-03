@@ -5,9 +5,9 @@ class HomeController {
     res.json({
       API_NAME: 'Orquindias API',
       ALLOWED_ROUTES: {
-        clothes: ['findOne', 'findAll']
-      }
-    })
+        clothes: ['findOne', 'findAll'],
+      },
+    });
   }
 }
 

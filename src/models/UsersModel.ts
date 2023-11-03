@@ -1,7 +1,6 @@
 import bcryptjs, { hash } from 'bcryptjs';
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database';
-import AddressesModel from './AddressesModel';
 import ClothesModel from './ClothesModel';
 import SalesModel from './SalesModel';
 
@@ -10,6 +9,7 @@ class UsersModel extends Model {
   declare name: string;
   declare lastname: string;
   declare cpf: string;
+  declare cep: string;
   declare email: string;
   declare password: string;
   declare password_hash: string;
@@ -54,6 +54,16 @@ UsersModel.init(
       allowNull: false,
     },
     cpf: {
+      type: DataTypes.STRING,
+      validate: {
+        notNull: {
+          msg: 'Last name field cannot be null',
+        },
+      },
+      unique: true,
+      allowNull: false,
+    },
+    cep: {
       type: DataTypes.STRING,
       validate: {
         notNull: {
@@ -132,6 +142,5 @@ UsersModel.addHook('beforeSave', async (user: UsersModel) => {
 
 UsersModel.hasMany(ClothesModel, { foreignKey: 'user_id' });
 UsersModel.hasMany(SalesModel, { foreignKey: 'user_id' });
-UsersModel.hasOne(AddressesModel, { foreignKey: 'user_id' });
 
 export default UsersModel;

@@ -20,9 +20,12 @@ module.exports = {
       },
       cpf: {
         type: Sequelize.STRING,
-        defaultValue: '',
         allowNull: false,
         unique: true,
+      },
+      cep: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,

@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import { resolve } from 'path';
 import homeRoutes from './routes/homeRoute';
+import usersRoutes from './routes/usersRoutes';
 
 dotenv.config();
 
@@ -20,7 +21,8 @@ class App {
   }
 
   routes() {
-    this.app.use('/', homeRoutes)
+    this.app.use('/', homeRoutes);
+    this.app.use('/user/', usersRoutes);
   }
 }
 

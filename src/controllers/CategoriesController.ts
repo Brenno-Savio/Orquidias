@@ -1,8 +1,9 @@
 import { Response } from 'express';
 import CategoriesModel from '../models/CategoriesModel';
 import { CustomReq, PromiseRes } from '../types';
+import Controller from '../types/Controller';
 
-class CategoryController {
+class CategoryController extends Controller {
   async store(req: CustomReq, res: Response): PromiseRes {
     try {
       const newCategory = await CategoriesModel.create(req.body);
