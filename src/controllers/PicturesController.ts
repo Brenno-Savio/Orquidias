@@ -19,11 +19,11 @@ class PictureController {
 
       try {
         const { originalname, filename } = req.file as CustomFile;
-        const { post_id } = req.body;
+        const { clothe_id } = req.body;
         const picture = await PicturesModel.create({
           originalname,
           filename,
-          post_id,
+          clothe_id,
         });
 
         return res.json(picture);

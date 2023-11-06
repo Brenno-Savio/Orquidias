@@ -3,29 +3,30 @@ import UsersModel from '../models/UsersModel';
 import { CustomReq, PromiseRes } from '../types';
 import Controller from '../types/Controller';
 import cepValidator from '../utils/cepValidator';
-import cpfValidator from '../utils/cpfValidatior';
+import cpfValidator from '../utils/cpfValidator';
 
 class UsersController extends Controller {
   async store(req: CustomReq, res: Response): PromiseRes {
     try {
-      const newUser = await UsersModel.create(req.body);
-      const { id, name, lastname, email, cpf, cep } = newUser;
+      const { cpf, cep } = req.body;
       const cleanCpf = cpfValidator(cpf);
       const cleanCep = await cepValidator(cep);
 
-      cleanCep === false
-      ? res.status(404).json({
+      if (!cleanCpf) {
+        return res.status(404).json({
+          errors: ['Invalid Cpf'],
+        });
+      }
+
+      if (!cleanCep) {
+        return res.status(404).json({
           errors: ['Invalid Cep'],
-        })
-      : cleanCep;
+        });
+      }
 
-      cleanCpf === false
-        ? res.status(404).json({
-            errors: ['Invalid Cpf'],
-          })
-        : cleanCpf;
+      const { id, name, lastname, email } = await UsersModel.create(req.body);
 
-      return res.json({ id, name, lastname, email, cleanCpf, cleanCep });
+      return res.json({ id, name, lastname, email, cleanCep, cleanCpf });
     } catch (e: any) {
       return res
         .status(400)
@@ -36,7 +37,7 @@ class UsersController extends Controller {
   async index(req: CustomReq, res: Response): PromiseRes {
     try {
       const Users = await UsersModel.findAll({
-        attributes: ['id', 'name', 'lastname', 'email', 'cpf'],
+        attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep'],
       });
       return res.json(Users);
     } catch (e) {
@@ -47,7 +48,7 @@ class UsersController extends Controller {
   async show(req: CustomReq, res: Response): PromiseRes {
     try {
       const User = await UsersModel.findByPk(req.params.id, {
-        attributes: ['id', 'name', 'lastname', 'email', 'cpf'],
+        attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep'],
       });
       return res.json(User);
     } catch (e) {
@@ -62,30 +63,33 @@ class UsersController extends Controller {
           errors: ['ID not sent'],
         });
       }
+
+      const { cpf, cep } = req.body;
+      const cleanCpf = cpfValidator(cpf);
+      const cleanCep = await cepValidator(cep);
+
+      if (!cleanCpf) {
+        return res.status(404).json({
+          errors: ['Invalid Cpf'],
+        });
+      }
+
+      if (!cleanCep) {
+        return res.status(404).json({
+          errors: ['Invalid Cep'],
+        });
+      }
+
       const user = await UsersModel.findByPk(req.params.id);
+
       if (!user) {
         return res.status(400).json({
           errors: ['user not found'],
         });
       }
-      const newData = await user.update(req.body);
-      const { id, email, name, lastname, cpf, cep } = newData;
-      const cleanCpf = cpfValidator(cpf);
-      const cleanCep = await cepValidator(cep);
 
-      cleanCep === false
-      ? res.status(404).json({
-          errors: ['Invalid Cep'],
-        })
-      : cleanCep;
-
-      cleanCpf === false
-        ? res.status(404).json({
-            errors: ['Invalid Cpf'],
-          })
-        : cleanCpf;
-
-        return res.json({ id, email, name, lastname, cleanCpf });
+      const { id, email, name, lastname } = await user.update(req.body);
+      return res.json({ id, email, name, lastname, cleanCpf, cleanCep });
     } catch (e: any) {
       return res
         .status(400)

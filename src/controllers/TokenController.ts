@@ -12,13 +12,13 @@ class TokenController {
         return res.status(401).json({ errors: ['Invalid email or password'] });
       }
 
-      const author = await UsersModel.findOne({ where: { email } });
+      const user = await UsersModel.findOne({ where: { email } });
 
-      if (!author) {
-        return res.status(401).json({ errors: ['This author not exist'] });
+      if (!user) {
+        return res.status(401).json({ errors: ['This user not exist'] });
       }
 
-      if (!(await author.passwordValidator(password))) {
+      if (!(await user.passwordValidator(password))) {
         return res.status(401).json({ errors: ['Invalid password'] });
       }
 
@@ -28,7 +28,7 @@ class TokenController {
         });
       }
 
-      const { id } = author;
+      const { id } = user;
       const token = jwt.sign({ id, email }, process.env.TOKEN_SECRET, {
         expiresIn: process.env.TOKEN_EXPIRATION,
       });
