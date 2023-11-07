@@ -9,14 +9,17 @@ import exist from '../utils/exist';
 class ClothesController extends Controller {
   async store(req: CustomReq, res: Response): PromiseRes {
     try {
+      const validUser = await exist(req.body.user_id, UsersModel);
+      const validCategory = await exist(req.body.category_id, CategoriesModel);
+
+      if (!validUser || !validCategory) {
+        return res.status(404).json({ errors: ['User or Category not found'] });
+      }
+
+      req.body.slug = `${req.body.name.replace(' ', '-')}-${req.body.color}`;
       const newClothe = await ClothesModel.create(req.body);
       const { id, name, price, stock, color, slug, user_id, category_id } =
         newClothe;
-
-      !exist(user_id, UsersModel) || !exist(category_id, CategoriesModel)
-        ? res.status(404).json({ errors: ['User or Category not found'] })
-        : user_id,
-        category_id;
 
       return res.json({
         id,
@@ -88,14 +91,19 @@ class ClothesController extends Controller {
           errors: ['clothe not found'],
         });
       }
+
+      if(req.body.user_id || req.body.category_id) {
+        const validUser = await exist(req.body.user_id, UsersModel);
+        const validCategory = await exist(req.body.category_id, CategoriesModel);
+
+        if (!validUser || !validCategory) {
+          return res.status(404).json({ errors: ['User or Category not found'] });
+        }
+      }
+
       const newData = await clothe.update(req.body);
       const { id, name, price, stock, color, slug, user_id, category_id } =
         newData;
-
-      !exist(user_id, UsersModel) || !exist(category_id, CategoriesModel)
-        ? res.status(404).json({ errors: ['User or Category not found'] })
-        : user_id,
-        category_id;
 
       return res.json({
         id,
@@ -125,6 +133,11 @@ class ClothesController extends Controller {
       if (!user) {
         return res.status(400).json({
           errors: ['User not found'],
+        });
+      }
+      if (user.stock > 0) {
+        return res.status(400).json({
+          errros: ['This clothe cannot be exclud while stock is more than 0'],
         });
       }
       await user.destroy();

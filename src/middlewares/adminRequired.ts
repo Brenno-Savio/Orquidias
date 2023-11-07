@@ -15,7 +15,6 @@ export default async (
     const data = jwt.verify(token, process.env.TOKEN_SECRET as string);
     const { id } = data as jwt.JwtPayload;
     const user = await UsersModel.findByPk(id, { attributes: ['admin'] });
-    console.log(user?.dataValues.admin);
 
     if (!user?.dataValues.admin)
       return res.status(400).json({

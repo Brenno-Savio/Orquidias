@@ -15,15 +15,15 @@ export default async (req: CustomReq, res: Response, next: NextFunction): Promis
   try {
     const data = jwt.verify(token, process.env.TOKEN_SECRET as string);
     const { id, email, admin } = data as jwt.JwtPayload;
-    const author = await UsersModel.findOne({
+    const user = await UsersModel.findOne({
       where: {
         id,
       }
     })
 
-    if(!author) {
+    if(!user) {
       return res.status(401).json({
-        errors: ['Expired or invalid author'],
+        errors: ['Expired or invalid user'],
       });
     }
     req.userId = id;

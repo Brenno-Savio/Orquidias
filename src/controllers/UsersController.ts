@@ -8,9 +8,8 @@ import cpfValidator from '../utils/cpfValidator';
 class UsersController extends Controller {
   async store(req: CustomReq, res: Response): PromiseRes {
     try {
-      const { cpf, cep } = req.body;
-      const cleanCpf = cpfValidator(cpf);
-      const cleanCep = await cepValidator(cep);
+      const cleanCpf = cpfValidator(req.body.cpf);
+      const cleanCep = await cepValidator(req.body.cep);
 
       if (!cleanCpf) {
         return res.status(404).json({
@@ -24,9 +23,14 @@ class UsersController extends Controller {
         });
       }
 
-      const { id, name, lastname, email } = await UsersModel.create(req.body);
+      req.body.cpf = cleanCpf;
+      req.body.cep = cleanCep;
 
-      return res.json({ id, name, lastname, email, cleanCep, cleanCpf });
+      const { id, name, lastname, email, cpf, cep } = await UsersModel.create(
+        req.body,
+      );
+
+      return res.json({ id, name, lastname, email, cpf, cep });
     } catch (e: any) {
       return res
         .status(400)
@@ -37,7 +41,7 @@ class UsersController extends Controller {
   async index(req: CustomReq, res: Response): PromiseRes {
     try {
       const Users = await UsersModel.findAll({
-        attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep'],
+        attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep', 'admin'],
       });
       return res.json(Users);
     } catch (e) {
@@ -48,7 +52,7 @@ class UsersController extends Controller {
   async show(req: CustomReq, res: Response): PromiseRes {
     try {
       const User = await UsersModel.findByPk(req.params.id, {
-        attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep'],
+        attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep', 'admin'],
       });
       return res.json(User);
     } catch (e) {
@@ -63,10 +67,8 @@ class UsersController extends Controller {
           errors: ['ID not sent'],
         });
       }
-
-      const { cpf, cep } = req.body;
-      const cleanCpf = cpfValidator(cpf);
-      const cleanCep = await cepValidator(cep);
+      const cleanCpf = cpfValidator(req.body.cpf);
+      const cleanCep = await cepValidator(req.body.cep);
 
       if (!cleanCpf) {
         return res.status(404).json({
@@ -88,8 +90,16 @@ class UsersController extends Controller {
         });
       }
 
-      const { id, email, name, lastname } = await user.update(req.body);
-      return res.json({ id, email, name, lastname, cleanCpf, cleanCep });
+      if ((!user.admin && req.body.admin) || (user.admin && !req.body.admin)) {
+        return res.status(400).json({
+          errors: ['You cannot change your admin status'],
+        });
+      }
+
+      const { id, email, name, lastname, cep, cpf, admin } = await user.update(
+        req.body,
+      );
+      return res.json({ id, email, name, lastname, cep, cpf, admin });
     } catch (e: any) {
       return res
         .status(400)

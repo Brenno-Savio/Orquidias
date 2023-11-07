@@ -60,12 +60,6 @@ ClothesModel.init(
   },
 );
 
-ClothesModel.addHook('beforeSave', (clothe: ClothesModel) => {
-  if (clothe.slug) {
-    clothe.slug = `${clothe.name.replace(' ', '-')}${clothe.color}`;
-  }
-})
-
 ClothesModel.hasMany(PictureModel, { foreignKey: 'clothe_id' });
 ClothesModel.hasMany(SalesModel, { foreignKey: 'clothe_id' });
 
