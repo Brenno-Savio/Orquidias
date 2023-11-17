@@ -57,8 +57,6 @@ class UsersController extends Controller {
   async index(req: CustomReq, res: Response): PromiseRes {
     const { filter, sort, page } = req.query;
 
-    // const typedPage = page as pageType;
-
     const paramQuery: FindOptions = {
       attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep', 'admin'],
     };

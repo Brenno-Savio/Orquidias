@@ -22,7 +22,7 @@ export default async (req: CustomReq, res: Response, next: NextFunction): Promis
     })
 
     if(!user) {
-      return res.status(401).json({
+      return res.status(404).json({
         errors: ['Expired or invalid user'],
       });
     }
