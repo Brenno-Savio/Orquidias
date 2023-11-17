@@ -8,7 +8,7 @@ import { CustomFile, CustomReq, PromiseRes } from '../types';
 
 const upload = multer(multerConfig).single('picture');
 
-class PictureController {
+class PicturesController {
   store(req: CustomReq, res: Response): void {
     return upload(req, res, async (err): PromiseRes => {
       if (err) {
@@ -67,4 +67,4 @@ class PictureController {
   }
 }
 
-export default new PictureController();
+export default new PicturesController();

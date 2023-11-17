@@ -1,51 +1,100 @@
 import { Response } from 'express';
+import { FindOptions, Op } from 'sequelize';
 import UsersModel from '../models/UsersModel';
 import { CustomReq, PromiseRes } from '../types';
 import Controller from '../types/Controller';
-import cepValidator from '../utils/cepValidator';
-import cpfValidator from '../utils/cpfValidator';
+import { getErrorMessage } from '../utils/getErrorMessage';
+import reqValidator from '../utils/validators/reqValidator';
 
 class UsersController extends Controller {
   async store(req: CustomReq, res: Response): PromiseRes {
     try {
-      const cleanCpf = cpfValidator(req.body.cpf);
-      const cleanCep = await cepValidator(req.body.cep);
+      const requisition = {
+        name: 'users',
+        body: req.body,
+        errors: [],
+      };
 
-      if (!cleanCpf) {
-        return res.status(404).json({
-          errors: ['Invalid Cpf'],
+      const validReq = await reqValidator(requisition);
+
+      if (typeof validReq === 'undefined') {
+        return res.status(500).json({
+          errors: getErrorMessage('unknownError'),
         });
       }
 
-      if (!cleanCep) {
-        return res.status(404).json({
-          errors: ['Invalid Cep'],
-        });
+      if (validReq?.errors.length > 0) {
+        return res.status(400).json(validReq?.errors);
       }
-
-      req.body.cpf = cleanCpf;
-      req.body.cep = cleanCep;
 
       const { id, name, lastname, email, cpf, cep } = await UsersModel.create(
-        req.body,
+        validReq.body,
       );
 
-      return res.json({ id, name, lastname, email, cpf, cep });
+      return res.status(200).json({ id, name, lastname, email, cpf, cep });
     } catch (e: any) {
-      return res
-        .status(400)
-        .json({ errors: e.errors.map((err: any) => err.message) });
+      const err = e.errors.map((err: any) => err.message);
+
+      if (
+        err[0] === 'cpf must be unique' ||
+        err[0] === 'email must be unique'
+      ) {
+        return res.status(400).json({
+          errors: err,
+        });
+      }
+
+      return res.status(400).json({
+        errors: err,
+      });
+
+      // return res.status(500).json({
+      //   errors: getErrorMessage('unknownError'),
+      // });
     }
   }
 
   async index(req: CustomReq, res: Response): PromiseRes {
+    const { filter, sort, page } = req.query;
+
+    // const typedPage = page as pageType;
+
+    const paramQuery: FindOptions = {
+      attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep', 'admin'],
+    };
+    let limit;
+    let offset;
+
+    if (typeof filter === 'string') {
+      let query = filter.split(':');
+      let status;
+
+      if (query[0] === 'admin') {
+        query[1] === 'true' ? (status = true) : (status = false);
+
+        paramQuery.where = {
+          [query[0]]: {
+            [Op.eq]: status,
+          },
+        };
+      } else {
+        paramQuery.where = {
+          [query[0]]: query[1],
+        };
+      }
+    }
+
+    console.log(req.query);
+
     try {
-      const Users = await UsersModel.findAll({
-        attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep', 'admin'],
-      });
+      console.log(paramQuery);
+
+      const Users = await UsersModel.findAll(paramQuery);
       return res.json(Users);
-    } catch (e) {
-      return res.json(null);
+    } catch (e: any) {
+      return res.status(500).json({
+        errors: getErrorMessage('unknownError'),
+      });
     }
   }
 
@@ -56,7 +105,7 @@ class UsersController extends Controller {
       });
       return res.json(User);
     } catch (e) {
-      return res.json({ errors: ["this user doesn't exist"] });
+      return res.status(404).json({ errors: ['User not found'] });
     }
   }
 
@@ -67,25 +116,17 @@ class UsersController extends Controller {
           errors: ['ID not sent'],
         });
       }
-      const cleanCpf = cpfValidator(req.body.cpf);
-      const cleanCep = await cepValidator(req.body.cep);
 
-      if (!cleanCpf) {
-        return res.status(404).json({
-          errors: ['Invalid Cpf'],
-        });
-      }
-
-      if (!cleanCep) {
-        return res.status(404).json({
-          errors: ['Invalid Cep'],
-        });
-      }
+      const requisition = {
+        name: 'users',
+        body: req.body,
+        errors: [],
+      };
 
       const user = await UsersModel.findByPk(req.params.id);
 
       if (!user) {
-        return res.status(400).json({
+        return res.status(404).json({
           errors: ['user not found'],
         });
       }
@@ -96,14 +137,26 @@ class UsersController extends Controller {
         });
       }
 
+      const validReq = await reqValidator(requisition);
+
+      if (typeof validReq === 'undefined') {
+        return res.status(500).json({
+          errors: getErrorMessage('unknownError'),
+        });
+      }
+
+      if (validReq?.errors.length > 0) {
+        return res.status(400).json(validReq?.errors);
+      }
+
       const { id, email, name, lastname, cep, cpf, admin } = await user.update(
-        req.body,
+        validReq?.body,
       );
       return res.json({ id, email, name, lastname, cep, cpf, admin });
     } catch (e: any) {
-      return res
-        .status(400)
-        .json({ errors: e.errors.map((err: any) => err.message) });
+      return res.status(500).json({
+        errors: getErrorMessage('unknownError'),
+      });
     }
   }
 
@@ -116,16 +169,16 @@ class UsersController extends Controller {
       }
       const user = await UsersModel.findByPk(req.params.id);
       if (!user) {
-        return res.status(400).json({
+        return res.status(404).json({
           errors: ['User not found'],
         });
       }
       await user.destroy();
       return res.json(`This user was deleted successfully`);
     } catch (e: any) {
-      return res
-        .status(400)
-        .json({ errors: e.errors.map((err: any) => err.message) });
+      return res.status(500).json({
+        errors: getErrorMessage('unknownError'),
+      });
     }
   }
 }

@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import categoriesRoutes from './routes/categoriesRoutes';
 import clothesRoutes from './routes/clothesRoutes';
 import homeRoutes from './routes/homeRoute';
-import pictureRoutes from './routes/pictureRoutes';
+import picturesRoutes from './routes/picturesRoutes';
 import salesRoutes from './routes/salesRoutes';
 import tokenRoutes from './routes/tokenRoutes';
 import usersRoutes from './routes/usersRoutes';
@@ -32,7 +32,7 @@ class App {
     this.app.use('/category/', categoriesRoutes);
     this.app.use('/clothe/', clothesRoutes);
     this.app.use('/sale/', salesRoutes);
-    this.app.use('/picture/', pictureRoutes);
+    this.app.use('/picture/', picturesRoutes);
   }
 }
 

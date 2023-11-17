@@ -1,11 +1,21 @@
 import { Response } from 'express';
+import ClothesModel from '../models/ClothesModel';
 import SalesModel from '../models/SalesModel';
+import UsersModel from '../models/UsersModel';
 import { CustomReq, PromiseRes } from '../types';
 import Controller from '../types/Controller';
+import exist from '../utils/exist';
 
 class SalesController extends Controller {
   async store(req: CustomReq, res: Response): PromiseRes {
     try {
+      const validUser = await exist(req.body.user_id, UsersModel);
+      const validClothe = await exist(req.body.category_id, ClothesModel);
+
+      if (!validUser || !validClothe) {
+        return res.status(404).json({ errors: ['User or Clothe not found'] });
+      }
+
       const newSale = await SalesModel.create(req.body);
       const { id, clothe_price, confirmed_sale, user_id, clothe_id } = newSale;
       return res.json({ id, clothe_price, confirmed_sale, user_id, clothe_id });

@@ -2,14 +2,14 @@ import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database';
 import urlConfig from '../config/urlConfig';
 
-class PictureModel extends Model {
+class PicturesModel extends Model {
   declare id: number;
   declare originalname: string;
   declare filename: string;
   declare clothe_id: number;
 }
 
-PictureModel.init(
+PicturesModel.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -48,4 +48,4 @@ PictureModel.init(
   },
 );
 
-export default PictureModel;
+export default PicturesModel;

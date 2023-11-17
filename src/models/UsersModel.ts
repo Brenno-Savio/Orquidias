@@ -106,6 +106,7 @@ UsersModel.init(
       type: DataTypes.STRING,
       defaultValue: '',
       allowNull: false,
+      unique: true,
     },
     admin: {
       type: DataTypes.BOOLEAN,
