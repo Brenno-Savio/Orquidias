@@ -7,9 +7,11 @@ export default function checkSymbol(
   errorsArray: string[],
   message: errorMessageParams,
 ): string[] {
-  const valid = /((?=.*\W)|(?=.*_))^[^ ]+$/.test(value);
+  let valid
 
   if (has) {
+    valid = /((?=.*\W)|(?=.*_))^[^ ]+$/.test(value);
+
     if (!valid) {
       errorsArray.push(getErrorMessage(message.errorName, ...message.args));
       return errorsArray;
@@ -17,7 +19,9 @@ export default function checkSymbol(
 
     return errorsArray;
   } else {
-    if (valid) {
+    valid = /[a-zA-Z0-9À-ÿ]+$/.test(value)
+
+    if (!valid) {
       errorsArray.push(getErrorMessage(message.errorName, ...message.args));
       return errorsArray;
     }

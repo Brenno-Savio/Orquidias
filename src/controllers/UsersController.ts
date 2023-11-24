@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { FindOptions, Op } from 'sequelize';
+import { FindOptions, Op, OrderItem } from 'sequelize';
 import UsersModel from '../models/UsersModel';
 import { CustomReq, PromiseRes } from '../types';
 import Controller from '../types/Controller';
@@ -57,6 +57,9 @@ class UsersController extends Controller {
   async index(req: CustomReq, res: Response): PromiseRes {
     const { filter, sort, page } = req.query;
 
+    console.log(req.query);
+
+
     const paramQuery: FindOptions = {
       attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep', 'admin'],
     };
@@ -82,11 +85,20 @@ class UsersController extends Controller {
       }
     }
 
+    console.log();
     console.log(req.query);
+    console.log();
+
+    if(typeof sort !== 'undefined' && sort !== '') {
+      let queryArray = [];
+      for (const i of sort as string[]) {
+        let query = i.split(':');
+        queryArray.push(query);
+        paramQuery.order = [...queryArray] as OrderItem[];
+      }
+    }
 
     try {
-      console.log(paramQuery);
-
       const Users = await UsersModel.findAll(paramQuery);
       return res.json(Users);
     } catch (e: any) {
