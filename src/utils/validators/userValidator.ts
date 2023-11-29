@@ -12,7 +12,6 @@ import cpfValidator from './cpfValidator';
 
 export default async function UserValidator(req: reqValidate) {
   req.errors = [
-    ...req.errors,
     ...checkLength(req.body.name, 3, 20, req.errors, {
       errorName: errorsIndex.lengthError,
       args: ['name', '3', '20'],
@@ -20,7 +19,6 @@ export default async function UserValidator(req: reqValidate) {
   ];
 
   req.errors = [
-    ...req.errors,
     ...checkNumber(req.body.name, false, req.errors, {
       errorName: errorsIndex.cannotHave,
       args: ['name', 'numbers'],

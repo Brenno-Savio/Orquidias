@@ -1,8 +1,9 @@
 import { Response } from 'express';
-import { FindOptions, Op, OrderItem } from 'sequelize';
+import { FindOptions, OrderItem, WhereOptions } from 'sequelize';
 import UsersModel from '../models/UsersModel';
 import { CustomReq, PromiseRes } from '../types';
 import Controller from '../types/Controller';
+import filterSystem from '../utils/filterSystem';
 import { getErrorMessage } from '../utils/getErrorMessage';
 import reqValidator from '../utils/validators/reqValidator';
 
@@ -57,37 +58,18 @@ class UsersController extends Controller {
   async index(req: CustomReq, res: Response): PromiseRes {
     const { filter, sort, page } = req.query;
 
-    console.log(req.query);
-
-
     const paramQuery: FindOptions = {
       attributes: ['id', 'name', 'lastname', 'email', 'cpf', 'cep', 'admin'],
     };
     let limit;
     let offset;
 
-    if (typeof filter === 'string') {
-      let query = filter.split(':');
-      let status;
+    console.log(filter);
 
-      if (query[0] === 'admin') {
-        query[1] === 'true' ? (status = true) : (status = false);
 
-        paramQuery.where = {
-          [query[0]]: {
-            [Op.eq]: status,
-          },
-        };
-      } else {
-        paramQuery.where = {
-          [query[0]]: query[1],
-        };
-      }
+    if (typeof filter !== 'undefined' && filter !== '') {
+      paramQuery.where = filterSystem(filter as string[]) as WhereOptions<any>;
     }
-
-    console.log();
-    console.log(req.query);
-    console.log();
 
     if(typeof sort !== 'undefined' && sort !== '') {
       let queryArray = [];
